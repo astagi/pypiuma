@@ -3,9 +3,11 @@ import time
 
 from pypiuma import optimize, PiumaError
 
+images_to_optimize = [ item for item in os.listdir("images") for repetitions in range(100) ]
+
 start = time.time()
 
-for image_file_name in os.listdir("images"):
+for image_file_name in images_to_optimize:
 	try:
 		path = optimize(os.path.join("images", image_file_name), 100, 50)
 	except PiumaError as err:
