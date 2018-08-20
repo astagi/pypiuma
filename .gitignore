@@ -1,0 +1,8 @@
+*.so
+*.pyc
+optimized/
+piloptimized/
+gen/
+
+piuma.h
+piuma.c
