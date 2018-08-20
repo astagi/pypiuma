@@ -13,7 +13,7 @@ def optimize(path, width, height):
     img.close()
     return dest_path
 
-images_to_optimize = [ item for item in os.listdir("images") for repetitions in range(100) ]
+images_to_optimize = [ item for item in os.listdir("images") for repetitions in range(400) ]
 
 start = time.time()
 

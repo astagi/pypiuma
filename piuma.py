@@ -3,7 +3,7 @@ import time
 
 from pypiuma import optimize, PiumaError
 
-images_to_optimize = [ item for item in os.listdir("images") for repetitions in range(100) ]
+images_to_optimize = [ item for item in os.listdir("images") for repetitions in range(400) ]
 
 start = time.time()
 

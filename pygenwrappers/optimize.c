@@ -14,7 +14,7 @@ _Optimize(PyObject * PYBINDGEN_UNUSED(dummy), PyObject *args, PyObject *kwargs, 
     //GoString gostr = {p: path, strlen(path)};
     retval = OptimizeWrapper(path, width, height);
     if (retval.message != NULL) {
-        PyErr_SetString(PyPiumaError_Type, "Something's went wrong");
+        PyErr_SetString(PyPiumaError_Type, retval.message);
         return NULL;
     }
     py_retval = Py_BuildValue((char *) "s", retval.path);

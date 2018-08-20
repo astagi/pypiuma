@@ -3,59 +3,141 @@ package main
 
 import (
 	"os"
+	"io"
+	"fmt"
+	"os/exec"
 	"github.com/nfnt/resize"
 	"image/jpeg"
 	"image/png"
 	"net/http"
 	"path/filepath"
 	"image"
-	_ "errors"
+	"errors"
 )
 
 
-func getType(file  *os.File) (string) {
-	buff := make([]byte, 512)
-	if _, err := file.Read(buff); err != nil {
-		return "ciao"
-	}
-	file.Seek(0, 0)
-	return http.DetectContentType(buff)
+type ImageHandler interface {
+    ImageType() string
+    Decode(reader io.Reader) (image.Image, error)
+    Encode(newImgFile *os.File, newImage image.Image) error
+    Convert(newImageTempPath string, quality uint) error
 }
 
+func NewImageHandler(file  *os.File) (ImageHandler, error) {
+	buff := make([]byte, 512)
+	if _, err := file.Read(buff); err != nil {
+		return nil, errors.New("Can't get type of this file")
+	}
+	defer file.Seek(0, 0)
+    switch http.DetectContentType(buff) {
+		case "image/jpeg":
+			return &JPEGHandler{}, nil
+		case "image/png":
+			return &PNGHandler{}, nil
+		default:
+			return nil, errors.New("Unsupported Image type")
+    }
+}
 
+type JPEGHandler struct {
+}
+
+func (j *JPEGHandler) ImageType() string {
+    return "image/png"
+}
+
+func (j *JPEGHandler) Decode(reader io.Reader) (image.Image, error) {
+    return jpeg.Decode(reader)
+}
+
+func (j *JPEGHandler) Encode(newImgFile *os.File, newImage image.Image) error {
+    return jpeg.Encode(newImgFile, newImage, nil)
+}
+
+func (j *JPEGHandler) Convert(newImageTempPath string, quality uint) error {
+    args := []string{fmt.Sprintf("--max=%d", quality), newImageTempPath}
+    cmd := exec.Command("jpegoptim", args...)
+    err := cmd.Run()
+    if err != nil {
+        return errors.New("Jpegoptim command not working")
+    }
+
+    return nil
+}
+
+type PNGHandler struct {
+}
+
+func (p *PNGHandler) ImageType() string {
+    return "image/png"
+}
+
+func (p *PNGHandler) Decode(reader io.Reader) (image.Image, error) {
+    return png.Decode(reader)
+}
+
+func (p *PNGHandler) Encode(newImgFile *os.File, newImage image.Image) error {
+    return png.Encode(newImgFile, newImage)
+}
+
+func (p *PNGHandler) Convert(newImageTempPath string, quality uint) error {
+    args := []string{newImageTempPath, "-f", "--ext=\"\""}
+
+    if quality != 100 {
+        var qualityMin = quality - 10
+        qualityParameter := fmt.Sprintf("--quality=%[1]d-%[2]d", qualityMin, quality)
+        args = append([]string{qualityParameter}, args...)
+    }
+    cmd := exec.Command("pngquant", args...)
+    err := cmd.Run()
+    if err != nil {
+        return errors.New("Pngquant command not working")
+    }
+
+    return nil
+}
 
 func Optimize(path string, width uint, height uint) (string, error) {
 
 	var file *os.File
 	var newFileImg *os.File
+	var img image.Image = nil
+	var err error = nil
+	var imageHandler ImageHandler
 
 	file, _ = os.Open(path)
 
 	defer file.Close()
 
-	var imageType string = getType(file)
-	var img image.Image = nil
+	imageHandler, err = NewImageHandler(file)
 
-	if imageType == "image/jpeg" {
-		img, _ = jpeg.Decode(file)
+	if err != nil {
+		return "", err
 	}
-	if imageType == "image/png" {
-		img, _ = png.Decode(file)
+
+	img, err = imageHandler.Decode(file)
+
+	if err != nil {
+		return "", err
 	}
 
 	newImage := resize.Resize(width, height, img, resize.NearestNeighbor)
 
 	var destPath string = filepath.Join("optimized", filepath.Base(path))
 
-	newFileImg, _ = os.Create(destPath)
+	newFileImg, err = os.Create(destPath)
+
+	if err != nil {
+		return "", err
+	}
+
 	defer newFileImg.Close()
 
-	if imageType == "image/jpeg" {
-		jpeg.Encode(newFileImg, newImage, nil)
-	}
-	if imageType == "image/png" {
-		png.Encode(newFileImg, newImage)
-	}
+	err = imageHandler.Encode(newFileImg, newImage)
+
+	if err != nil {
+        return "", err
+    }
 
 	return destPath, nil
 }
