@@ -81,7 +81,7 @@ func (p *PNGHandler) Encode(newImgFile *os.File, newImage image.Image) error {
 }
 
 func (p *PNGHandler) Convert(newImageTempPath string, quality uint) error {
-    args := []string{newImageTempPath, "-f", "--ext=\"\""}
+    args := []string{newImageTempPath, "-f", "--ext=.png"}
 
     if quality != 100 {
         var qualityMin = quality - 10
@@ -104,6 +104,7 @@ func Optimize(path string, width uint, height uint) (string, error) {
 	var img image.Image = nil
 	var err error = nil
 	var imageHandler ImageHandler
+	var destPath string = ""
 
 	file, _ = os.Open(path)
 
@@ -123,7 +124,7 @@ func Optimize(path string, width uint, height uint) (string, error) {
 
 	newImage := resize.Resize(width, height, img, resize.NearestNeighbor)
 
-	var destPath string = filepath.Join("optimized", filepath.Base(path))
+	destPath = filepath.Join("optimized", filepath.Base(path))
 
 	newFileImg, err = os.Create(destPath)
 
@@ -134,6 +135,8 @@ func Optimize(path string, width uint, height uint) (string, error) {
 	defer newFileImg.Close()
 
 	err = imageHandler.Encode(newFileImg, newImage)
+
+	go imageHandler.Convert(destPath, 100)
 
 	if err != nil {
         return "", err
