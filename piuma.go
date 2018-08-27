@@ -136,7 +136,7 @@ func Optimize(path string, width uint, height uint) (string, error) {
 
 	err = imageHandler.Encode(newFileImg, newImage)
 
-	go imageHandler.Convert(destPath, 100)
+	imageHandler.Convert(destPath, 100)
 
 	if err != nil {
         return "", err

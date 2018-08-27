@@ -22,8 +22,7 @@ def optimize(path, width, height):
     dest_path = os.path.join('.', 'piloptimized', os.path.basename(path))
     img.save(dest_path)
     img.close()
-    thread = threading.Thread(target = convert, args = (img_format, dest_path) )
-    thread.start()
+    convert(img_format, dest_path)
     return dest_path
 
 images_to_optimize = [ item for item in os.listdir("images") for repetitions in range(1) ]

@@ -11,7 +11,7 @@ _Optimize(PyObject * PYBINDGEN_UNUSED(dummy), PyObject *args, PyObject *kwargs, 
     if (!PyArg_ParseTupleAndKeywords(args, kwargs, (char *) "sii", (char **) keywords, &path, &width, &height)) {
         return NULL;
     }
-    //GoString gostr = {p: path, strlen(path)};
+
     retval = OptimizeWrapper(path, width, height);
     if (retval.message != NULL) {
         PyErr_SetString(PyPiumaError_Type, retval.message);
