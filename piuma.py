@@ -9,7 +9,7 @@ start = time.time()
 
 for image_file_name in images_to_optimize:
 	try:
-		path = optimize(image_file_name, 100, 50)
+		path = optimize(image_file_name, 200)
 	except PiumaError as err:
 		print (err)
 
@@ -19,7 +19,7 @@ print('Optimize each picture:', end - start)
 start = time.time()
 
 try:
-	path = optimize_list(images_to_optimize, 100, 50)
+	path = optimize_list(images_to_optimize, 200)
 except PiumaError as err:
 	print (err)
 
@@ -30,7 +30,7 @@ print('Optimize list:', end - start)
 start = time.time()
 
 try:
-	path = optimize_dir("./images", 200, 0)
+	path = optimize_dir("./images", 200)
 except PiumaError as err:
 	print (err)
 
