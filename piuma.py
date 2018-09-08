@@ -14,7 +14,7 @@ for image_file_name in images_to_optimize:
 		print (err)
 
 end = time.time()
-print(end - start)
+print('Optimize each picture:', end - start)
 
 start = time.time()
 
@@ -25,16 +25,16 @@ except PiumaError as err:
 
 end = time.time()
 
-print(end - start)
+print('Optimize list:', end - start)
 
 start = time.time()
 
 try:
-	path = optimize_dir("./images", 100, 50)
+	path = optimize_dir("./images", 200, 0)
 except PiumaError as err:
 	print (err)
 
 end = time.time()
 
 
-print(end - start)
+print('Optimize directory:', end - start)

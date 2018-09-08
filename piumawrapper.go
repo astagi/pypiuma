@@ -10,6 +10,7 @@ import "C"
 
 import (
 	_"fmt"
+	"sync"
 	"unsafe"
 	"io/ioutil"
 	"path/filepath"
@@ -18,20 +19,33 @@ import (
 
 //export OptimizeListWrapper
 func OptimizeListWrapper(path **C.char, pathElements int, width uint, height uint) (C.struct_PiumaResult) {
-	cStrings := (*[1 << 30]*C.char)(unsafe.Pointer(path))[:pathElements:pathElements]
+	var wg sync.WaitGroup
+	cStrings := (*[1<<30]*C.char)(unsafe.Pointer(path))[:pathElements:pathElements]
 	for _, path := range cStrings {
-		Optimize(C.GoString(path), width, height)
+		wg.Add(1)
+		go func(filePath string, width uint, height uint) {
+			defer wg.Done()
+			Optimize(filePath, width, height)
+		}(C.GoString(path), width, height)
 	}
+	wg.Wait()
 	return C.struct_PiumaResult{path: nil, message: nil}
 }
 
 //export OptimizeFromDirWrapper
 func OptimizeFromDirWrapper(path *C.char, width uint, height uint) (C.struct_PiumaResult) {
 	var targetPath = C.GoString(path)
+	var wg sync.WaitGroup
 	files, _ := ioutil.ReadDir(targetPath)
+	wg.Add(len(files))
 	for _, f := range files {
-		Optimize(filepath.Join(targetPath, f.Name()), width, height)
+
+		go func(filePath string, width uint, height uint) {
+			defer wg.Done()
+			Optimize(filePath, width, height)
+		}(filepath.Join(targetPath, f.Name()), width, height)
 	}
+	wg.Wait()
 	return C.struct_PiumaResult{path: nil, message: nil}
 }
 
@@ -46,4 +60,5 @@ func OptimizeWrapper(path *C.char, width uint, height uint) (C.struct_PiumaResul
 }
 
 func main() {
+	//OptimizeFromDirWrapper("./images", 100, 50);
 }
