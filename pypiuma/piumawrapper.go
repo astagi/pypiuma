@@ -59,6 +59,3 @@ func OptimizeWrapper(path *C.char, width uint, height uint) (C.struct_PiumaResul
 		return C.struct_PiumaResult{path: nil, message: C.CString(err.Error())}
 	}
 }
-
-func main() {
-}

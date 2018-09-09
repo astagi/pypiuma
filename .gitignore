@@ -6,4 +6,5 @@ gen/
 
 .vscode
 *.grind
+*.profile
 *.cprof

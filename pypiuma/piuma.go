@@ -93,7 +93,6 @@ func (p *PNGHandler) Convert(newImageTempPath string, quality uint) error {
     if err != nil {
         return errors.New("Pngquant command not working")
     }
-
     return nil
 }
 

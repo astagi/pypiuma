@@ -10,7 +10,7 @@ rm *.a
 # gcc piuma.c -dynamiclib piuma.so -o pypiuma.so `pkg-config --cflags --libs python3`
 
 
-go build -buildmode=c-archive -o libpiuma.a piuma.go piumawrapper.go
+go build -buildmode=c-archive -o libpiuma.a main.go piuma.go piumawrapper.go
 
 python pygen.py > piuma.c
 

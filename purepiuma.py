@@ -20,7 +20,7 @@ def convert(img_format, dest_path):
     subprocess.Popen(
         [opt_command], shell=True,
         stdout=FNULL, stderr=subprocess.STDOUT
-    )
+    ).wait()
 
 
 def optimize(path, width=0, height=0):
@@ -43,19 +43,12 @@ def optimize(path, width=0, height=0):
     except Exception as err:
         print (err)
 
+
 def pureppiuma():
     images_to_optimize = [ item for item in os.listdir("images") for repetitions in range(1) ]
     for image_file_name in images_to_optimize:
         optimize(os.path.join("images", image_file_name), 200)
-    # threads = []
 
-    # for image_file_name in images_to_optimize:
-    #     thread = Thread(target=optimize, args=(os.path.join("images", image_file_name), 200))
-    #     threads.append(thread)
-    #     thread.start()
-
-    # for thread in threads:
-    #     thread.join()
 
 start = time.time()
 pureppiuma()
