@@ -11,7 +11,7 @@ Experimental porting of Piuma code (written in Go) in Python 3
 
 ## Build the library
 
-    ./build.sh
+    cd pypiuma && ./build.sh
 
 ## Try yourself
 
