@@ -25,7 +25,6 @@ def convert(img_format, dest_path):
 
 def optimize(path, width=0, height=0):
     try:
-
         dest_path = os.path.join('.', 'piloptimized', os.path.basename(path))
         img = Image.open(path)
         img_format = img.format

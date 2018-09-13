@@ -13,14 +13,15 @@ import (
 	"net/http"
 	"path/filepath"
 	"errors"
+	//"github.com/pixiv/go-libjpeg/jpeg"
 )
 
 
 type ImageHandler interface {
-    ImageType() string
-    Decode(reader io.Reader) (image.Image, error)
-    Encode(newImgFile *os.File, newImage image.Image) error
-    Convert(newImageTempPath string, quality uint) error
+	ImageType() string
+	Decode(reader io.Reader) (image.Image, error)
+	Encode(newImgFile *os.File, newImage image.Image) error
+	Convert(newImageTempPath string, quality uint) error
 }
 
 func NewImageHandler(file  *os.File) (ImageHandler, error) {
@@ -29,71 +30,73 @@ func NewImageHandler(file  *os.File) (ImageHandler, error) {
 		return nil, errors.New("Can't get type of this file")
 	}
 	defer file.Seek(0, 0)
-    switch http.DetectContentType(buff) {
+	switch http.DetectContentType(buff) {
 		case "image/jpeg":
 			return &JPEGHandler{}, nil
 		case "image/png":
 			return &PNGHandler{}, nil
 		default:
 			return nil, errors.New("Unsupported Image type")
-    }
+	}
 }
 
 type JPEGHandler struct {
 }
 
 func (j *JPEGHandler) ImageType() string {
-    return "image/png"
+	return "image/png"
 }
 
 func (j *JPEGHandler) Decode(reader io.Reader) (image.Image, error) {
-    return jpeg.Decode(reader)
+	return jpeg.Decode(reader)
+	//return jpeg.Decode(reader, &jpeg.DecoderOptions{})
 }
 
 func (j *JPEGHandler) Encode(newImgFile *os.File, newImage image.Image) error {
-    return jpeg.Encode(newImgFile, newImage, nil)
+	return jpeg.Encode(newImgFile, newImage, nil)
+	//return jpeg.Encode(newImgFile, newImage, &jpeg.EncoderOptions{Quality: 90});
 }
 
 func (j *JPEGHandler) Convert(newImageTempPath string, quality uint) error {
-    args := []string{fmt.Sprintf("--max=%d", quality), newImageTempPath}
-    cmd := exec.Command("jpegoptim", args...)
-    err := cmd.Run()
-    if err != nil {
-        return errors.New("Jpegoptim command not working")
-    }
+	args := []string{fmt.Sprintf("--max=%d", quality), newImageTempPath}
+	cmd := exec.Command("jpegoptim", args...)
+	err := cmd.Run()
+	if err != nil {
+		return errors.New("Jpegoptim command not working")
+	}
 
-    return nil
+	return nil
 }
 
 type PNGHandler struct {
 }
 
 func (p *PNGHandler) ImageType() string {
-    return "image/png"
+	return "image/png"
 }
 
 func (p *PNGHandler) Decode(reader io.Reader) (image.Image, error) {
-    return png.Decode(reader)
+	return png.Decode(reader)
 }
 
 func (p *PNGHandler) Encode(newImgFile *os.File, newImage image.Image) error {
-    return png.Encode(newImgFile, newImage)
+	return png.Encode(newImgFile, newImage)
 }
 
 func (p *PNGHandler) Convert(newImageTempPath string, quality uint) error {
-    args := []string{newImageTempPath, "-f", "--ext=.png"}
+	args := []string{newImageTempPath, "-f", "--ext=.png"}
 
-    if quality != 100 {
-        var qualityMin = quality - 10
-        qualityParameter := fmt.Sprintf("--quality=%[1]d-%[2]d", qualityMin, quality)
-        args = append([]string{qualityParameter}, args...)
-    }
-    cmd := exec.Command("pngquant", args...)
-    err := cmd.Run()
-    if err != nil {
-        return errors.New("Pngquant command not working")
-    }
-    return nil
+	if quality != 100 {
+		var qualityMin = quality - 10
+		qualityParameter := fmt.Sprintf("--quality=%[1]d-%[2]d", qualityMin, quality)
+		args = append([]string{qualityParameter}, args...)
+	}
+	cmd := exec.Command("pngquant", args...)
+	err := cmd.Run()
+	if err != nil {
+		return errors.New("Pngquant command not working")
+	}
+	return nil
 }
 
 func Optimize(path string, width uint, height uint) (string, error) {
@@ -135,11 +138,15 @@ func Optimize(path string, width uint, height uint) (string, error) {
 
 	err = imageHandler.Encode(newFileImg, newImage)
 
+	if err != nil {
+		fmt.Println(err)
+	}
+
 	imageHandler.Convert(destPath, 100)
 
 	if err != nil {
-        return "", err
-    }
+		return "", err
+	}
 
 	return destPath, nil
 }

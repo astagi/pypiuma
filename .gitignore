@@ -5,6 +5,12 @@ piloptimized/
 gen/
 
 .vscode
+
+# Profiling related
+
 *.grind
 *.profile
 *.cprof
+
+*.dot
+*.dot.ps

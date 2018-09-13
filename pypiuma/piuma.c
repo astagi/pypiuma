@@ -185,9 +185,9 @@ PyObject * _wrap_pypiuma_optimize_dir(PyObject *self, PyObject *args, PyObject *
 PyObject * _wrap_pypiuma_optimize_dir(PyObject *self, PyObject *args, PyObject *kwargs);
 
 static PyMethodDef pypiuma_functions[] = {
-    {(char *) "optimize", (PyCFunction) _wrap_pypiuma_optimize, METH_VARARGS|METH_KEYWORDS, NULL },
-    {(char *) "optimize_list", (PyCFunction) _wrap_pypiuma_optimize_list, METH_VARARGS|METH_KEYWORDS, NULL },
-    {(char *) "optimize_dir", (PyCFunction) _wrap_pypiuma_optimize_dir, METH_VARARGS|METH_KEYWORDS, NULL },
+    {(char *) "optimize", (PyCFunction) _wrap_pypiuma_optimize, METH_KEYWORDS|METH_VARARGS, NULL },
+    {(char *) "optimize_list", (PyCFunction) _wrap_pypiuma_optimize_list, METH_KEYWORDS|METH_VARARGS, NULL },
+    {(char *) "optimize_dir", (PyCFunction) _wrap_pypiuma_optimize_dir, METH_KEYWORDS|METH_VARARGS, NULL },
     {NULL, NULL, 0, NULL}
 };
 /* --- exceptions --- */
