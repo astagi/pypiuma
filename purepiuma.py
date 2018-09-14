@@ -49,7 +49,12 @@ def pureppiuma():
         optimize(os.path.join("images", image_file_name), 200)
 
 
-start = time.time()
-pureppiuma()
-end = time.time()
-print(end - start)
+def main():
+    start = time.time()
+    pureppiuma()
+    end = time.time()
+    print(end - start)
+
+
+if __name__== "__main__":
+  main()

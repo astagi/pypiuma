@@ -33,21 +33,21 @@ func OptimizeListWrapper(path **C.char, pathElements int, width uint, height uin
 
 //export OptimizeFromDirWrapper
 func OptimizeFromDirWrapper(path *C.char, width uint, height uint) (C.struct_PiumaResult) {
-	//var wg sync.WaitGroup
+	var wg sync.WaitGroup
 	godirwalk.Walk(C.GoString(path), &godirwalk.Options {
 		Callback: func(osPathname string, de *godirwalk.Dirent) error {
-			// wg.Add(1)
-			// go func(filePath string, width uint, height uint) {
-			// 	defer wg.Done()
-			// 	Optimize(filePath, width, height)
-			// }(osPathname, width, height)
-			Optimize(osPathname, width, height)
+			wg.Add(1)
+			go func(filePath string, width uint, height uint) {
+				defer wg.Done()
+				Optimize(filePath, width, height)
+			}(osPathname, width, height)
+			//Optimize(osPathname, width, height)
 			return nil
 		},
 		Unsorted: true,
 	})
 
-	//wg.Wait()
+	wg.Wait()
 	return C.struct_PiumaResult{path: nil, message: nil}
 }
 

@@ -8,12 +8,12 @@ import (
 	"os/exec"
 	"github.com/nfnt/resize"
 	"image"
-	"image/jpeg"
+	//"image/jpeg"
 	"image/png"
 	"net/http"
 	"path/filepath"
 	"errors"
-	//"github.com/pixiv/go-libjpeg/jpeg"
+	"github.com/pixiv/go-libjpeg/jpeg"
 )
 
 
@@ -48,13 +48,13 @@ func (j *JPEGHandler) ImageType() string {
 }
 
 func (j *JPEGHandler) Decode(reader io.Reader) (image.Image, error) {
-	return jpeg.Decode(reader)
-	//return jpeg.Decode(reader, &jpeg.DecoderOptions{})
+	//return jpeg.Decode(reader)
+	return jpeg.Decode(reader, &jpeg.DecoderOptions{})
 }
 
 func (j *JPEGHandler) Encode(newImgFile *os.File, newImage image.Image) error {
-	return jpeg.Encode(newImgFile, newImage, nil)
-	//return jpeg.Encode(newImgFile, newImage, &jpeg.EncoderOptions{Quality: 90});
+	//return jpeg.Encode(newImgFile, newImage, nil)
+	return jpeg.Encode(newImgFile, newImage, &jpeg.EncoderOptions{Quality: 90});
 }
 
 func (j *JPEGHandler) Convert(newImageTempPath string, quality uint) error {
